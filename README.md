@@ -54,8 +54,8 @@ Pastikan komputer Anda sudah terinstall:
 
 4. **Buat File `bot.js`:**  
    Gunakan kode berikut sebagai isi file `bot.js`:
-   ```javascript
-require("dotenv").config();
+```javascipt
+   require("dotenv").config();
 const fs = require("fs");
 const readline = require("readline");
 const TelegramBot = require("node-telegram-bot-api");
@@ -205,8 +205,7 @@ console.log("🤖 Bot berjalan...");
 
 process.once("SIGINT", () => bot.stopPolling());
 process.once("SIGTERM", () => bot.stopPolling());
-
-   ```
+```
 
 ## Menjalankan Bot
 Setelah konfigurasi selesai, jalankan bot dengan perintah berikut:
