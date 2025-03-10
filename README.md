@@ -1,8 +1,4 @@
-Berikut adalah contoh README.md yang lengkap untuk proyek bot Telegram yang terhubung dengan API Hyperbolic, mulai dari pembuatan bot di BotFather hingga cara menjalankan bot.
 
----
-
-```markdown
 # Bot Telegram dengan API Hyperbolic
 
 Proyek ini adalah bot Telegram yang terintegrasi dengan API Hyperbolic. Bot ini memungkinkan pengguna untuk memasukkan API Key mereka sendiri sehingga setiap pengguna dapat mengakses API Hyperbolic secara independen. 
@@ -159,11 +155,6 @@ Bot akan mulai berjalan dan siap menerima pesan melalui Telegram.
   Jika terjadi kesalahan saat memproses permintaan ke API Hyperbolic, bot akan mengirim pesan error ke pengguna.
 - **Deployment:**  
   Untuk menjalankan bot secara terus-menerus, pertimbangkan menggunakan PM2 atau platform hosting seperti Railway, Render, atau VPS.
-
----
-
-Selamat mencoba dan semoga proyek ini bermanfaat!
-```
 
 ---
 
