@@ -55,78 +55,157 @@ Pastikan komputer Anda sudah terinstall:
 4. **Buat File `bot.js`:**  
    Gunakan kode berikut sebagai isi file `bot.js`:
    ```javascript
-   require("dotenv").config();
-   const TelegramBot = require("node-telegram-bot-api");
-   const OpenAI = require("openai");
+require("dotenv").config();
+const fs = require("fs");
+const readline = require("readline");
+const TelegramBot = require("node-telegram-bot-api");
+const fetch = require("node-fetch");
+const OpenAI = require("openai");
 
-   // Inisialisasi bot Telegram
-   const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+// Inisialisasi bot Telegram
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const userApiKeys = {};
 
-   // Simpan API Key user di memori sementara
-   const userApiKeys = {};
+bot.onText(/\/start/, (msg) => {
+  bot.sendMessage(
+    msg.chat.id,
+    "Halo! Gunakan perintah berikut:\n\n" +
+      "- /setkey YOUR_API_KEY untuk menyimpan API Key Hyperbolic\n" +
+      "- /chat [pesan] untuk bertanya ke AI\n" +
+      "- /image [prompt] untuk menghasilkan gambar"
+  );
+});
 
-   // Perintah untuk memulai bot
-   bot.onText(/\/start/, (msg) => {
-     bot.sendMessage(
-       msg.chat.id,
-       "Halo! Untuk menggunakan bot ini, silakan masukkan API Key Hyperbolic Anda dengan perintah:\n\n`/setkey YOUR_API_KEY`",
-       { parse_mode: "Markdown" }
-     );
-   });
+// User memasukkan API Key
+bot.onText(/\/setkey (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const apiKey = match?.[1];
 
-   // User memasukkan API Key
-   bot.onText(/\/setkey (.+)/, (msg, match) => {
-     const chatId = msg.chat.id;
-     const apiKey = match?.[1];
+  if (!apiKey) {
+    return bot.sendMessage(chatId, "⚠️ API Key tidak valid. Gunakan format: /setkey YOUR_API_KEY");
+  }
 
-     if (!apiKey) {
-       return bot.sendMessage(chatId, "⚠️ API Key tidak valid. Gunakan format: `/setkey YOUR_API_KEY`");
-     }
+  userApiKeys[chatId] = apiKey;
+  bot.sendMessage(chatId, "✅ API Key Anda telah disimpan!");
+});
 
-     userApiKeys[chatId] = apiKey; // Simpan API Key untuk user ini
-     bot.sendMessage(chatId, "✅ API Key Anda telah disimpan! Sekarang Anda bisa bertanya ke AI.");
-   });
+// Fungsi untuk mendapatkan nama file unik
+function getUniqueFileName(baseName) {
+  let fileName = baseName;
+  let counter = 1;
+  while (fs.existsSync(fileName)) {
+    const dotIndex = baseName.lastIndexOf(".");
+    if (dotIndex !== -1) {
+      fileName = `${baseName.slice(0, dotIndex)}(${counter})${baseName.slice(dotIndex)}`;
+    } else {
+      fileName = `${baseName}(${counter})`;
+    }
+    counter++;
+  }
+  return fileName;
+}
 
-   // User mengirim pertanyaan ke AI
-   bot.on("message", async (msg) => {
-     const chatId = msg.chat.id;
-     const userMessage = msg.text;
+// Handle chat dan image generation
+bot.on("message", async (msg) => {
+  const chatId = msg.chat.id;
+  const userMessage = msg.text;
 
-     if (!userMessage || userMessage.startsWith("/setkey")) return;
+  if (!userMessage || userMessage.startsWith("/setkey")) return;
 
-     const apiKey = userApiKeys[chatId];
-     if (!apiKey) {
-       return bot.sendMessage(chatId, "⚠️ Anda belum memasukkan API Key. Gunakan `/setkey YOUR_API_KEY`.");
-     }
+  const apiKey = userApiKeys[chatId];
+  if (!apiKey) {
+    return bot.sendMessage(chatId, "⚠️ Anda belum memasukkan API Key. Gunakan /setkey YOUR_API_KEY.");
+  }
 
-     bot.sendMessage(chatId, "⏳ Memproses...");
+  if (userMessage.startsWith("/chat")) {
+    const query = userMessage.replace("/chat", "").trim();
+    if (!query) return bot.sendMessage(chatId, "⚠️ Mohon masukkan teks setelah /chat");
 
-     try {
-       const client = new OpenAI({
-         apiKey: apiKey,
-         baseURL: process.env.HYPERBOLIC_API_URL,
-       });
+    bot.sendMessage(chatId, "⏳ Memproses...");
 
-       const response = await client.chat.completions.create({
-         messages: [
-           { role: "system", content: "You are an AI assistant." },
-           { role: "user", content: userMessage },
-         ],
-         model: process.env.MODEL,
-       });
+    try {
+      const client = new OpenAI({
+        apiKey: apiKey,
+        baseURL: process.env.HYPERBOLIC_API_URL,
+      });
 
-       const output = response.choices[0]?.message?.content || "Maaf, saya tidak bisa menjawab.";
-       bot.sendMessage(chatId, output);
-     } catch (error) {
-       console.error("Error fetching from Hyperbolic API:", error);
-       bot.sendMessage(chatId, "⚠️ Maaf, terjadi kesalahan dalam mendapatkan respon.");
-     }
-   });
+      const response = await client.chat.completions.create({
+        messages: [
+          { role: "system", content: "You are an AI assistant." },
+          { role: "user", content: query },
+        ],
+        model: process.env.MODEL,
+      });
 
-   console.log("🤖 Bot berjalan...");
+      const output = response.choices[0]?.message?.content || "Maaf, saya tidak bisa menjawab.";
+      bot.sendMessage(chatId, output);
+    } catch (error) {
+      console.error("Error fetching from Hyperbolic API:", error);
+      bot.sendMessage(chatId, "⚠️ Maaf, terjadi kesalahan dalam mendapatkan respon.");
+    }
+  } else if (userMessage.startsWith("/image")) {
+    const promptText = userMessage.replace("/image", "").trim();
+    if (!promptText) return bot.sendMessage(chatId, "⚠️ Mohon masukkan prompt setelah /image");
 
-   process.once("SIGINT", () => bot.stopPolling());
-   process.once("SIGTERM", () => bot.stopPolling());
+    bot.sendMessage(chatId, "⏳ Menghasilkan gambar...");
+    
+    try {
+      const url = "https://api.hyperbolic.xyz/v1/image/generation";
+      const payload = {
+        model_name: "SDXL1.0-base",
+        prompt: promptText,
+        height: 1024,
+        width: 1024,
+        backend: "auto",
+        lora: {
+          Pixel_Art: 0.5,
+          Logo: 0.5,
+          Paint_Splash: 0.9,
+        },
+      };
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Terjadi kesalahan: ${response.status} ${response.statusText}`);
+      }
+
+      const json = await response.json();
+      if (!json.images || json.images.length === 0 || !json.images[0].image) {
+        throw new Error("Respons API tidak mengandung data gambar yang valid.");
+      }
+
+      let base64Data = json.images[0].image;
+      if (base64Data.startsWith("data:image")) {
+        base64Data = base64Data.split(",")[1];
+      }
+
+      if (!base64Data) {
+        throw new Error("Data gambar kosong.");
+      }
+
+      const fileName = getUniqueFileName("image.jpg");
+      fs.writeFileSync(fileName, Buffer.from(base64Data, "base64"));
+      bot.sendPhoto(chatId, fileName, { caption: "✅ Gambar berhasil dihasilkan!" });
+    } catch (error) {
+      console.error("Error generating image:", error);
+      bot.sendMessage(chatId, "⚠️ Maaf, terjadi kesalahan saat menghasilkan gambar.");
+    }
+  }
+});
+
+console.log("🤖 Bot berjalan...");
+
+process.once("SIGINT", () => bot.stopPolling());
+process.once("SIGTERM", () => bot.stopPolling());
+
    ```
 
 ## Menjalankan Bot
