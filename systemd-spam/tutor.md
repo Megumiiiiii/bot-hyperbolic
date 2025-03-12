@@ -80,7 +80,7 @@ EOF
 ```
 
 ```
-sudo systmctl daemon-reload
+sudo systemctl daemon-reload
 sudo systemctl enable bolicloop
 sudo systemctl start bolicloop
 ```
