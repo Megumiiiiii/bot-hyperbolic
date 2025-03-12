@@ -13,7 +13,6 @@ Proyek ini adalah bot Telegram yang terintegrasi dengan API Hyperbolic. Bot ini 
 - [Catatan Tambahan](#catatan-tambahan)
 
 ## Fitur
-- **Input API Key oleh pengguna:** Pengguna dapat menyimpan API Key Hyperbolic mereka dengan perintah `/setkey`.
 - **Interaksi dengan API Hyperbolic:** Bot akan memproses pesan dari pengguna dan mengirimkannya ke API Hyperbolic untuk mendapatkan respons.
 - **Respon langsung melalui Telegram:** Jawaban dari API Hyperbolic langsung dikirimkan ke pengguna.
 
@@ -40,7 +39,7 @@ Pastikan komputer Anda sudah terinstall:
 2. **Instal Dependencies:**
    Jalankan perintah berikut untuk menginstal package yang diperlukan:
    ```bash
-   npm install axios node-telegram-bot-api openai dotenv prompt-sync
+   npm install dotenv node-telegram-bot-api node-fetch openai uuid
    ```
 
 3. **Buat File `.env`:**  
@@ -50,8 +49,10 @@ Pastikan komputer Anda sudah terinstall:
    
    Pastikan `YOUR_TELEGRAM_BOT_TOKEN` adalah token yang didapat dari BotFather.
 
+   API_KEY isi dengan apikey yang diberi oleh hyperbolic
+
 3. **Buat File `bot.js`:**  
-   Gunakan kode berikut sebagai isi file `bot.js`:
+   Gunakan kode berikut sebagai isi file `bot.js`
 
 ## Menjalankan Bot
 Setelah konfigurasi selesai, jalankan bot dengan perintah berikut:
@@ -59,19 +60,3 @@ Setelah konfigurasi selesai, jalankan bot dengan perintah berikut:
 node bot.js
 ```
 Bot akan mulai berjalan dan siap menerima pesan melalui Telegram.
-
-## Penggunaan Bot
-**Menyimpan API Key:**
-   - Gunakan perintah:
-     ```
-     /setkey YOUR_HYPERBOLIC_API_KEY
-     ```
-     untuk menyimpan API Key Hyperbolic milik Anda.
-
-## Catatan Tambahan
-- **Penyimpanan API Key:**  
-  API Key disimpan di memori server sementara. Jika server restart, API Key akan hilang. Untuk penyimpanan permanen, pertimbangkan menggunakan database.
-- **Error Handling:**  
-  Jika terjadi kesalahan saat memproses permintaan ke API Hyperbolic, bot akan mengirim pesan error ke pengguna.
-- **Deployment:**  
-  Untuk menjalankan bot secara terus-menerus, pertimbangkan menggunakan PM2 atau platform hosting seperti Railway, Render, atau VPS.
