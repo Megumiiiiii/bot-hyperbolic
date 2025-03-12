@@ -11,9 +11,29 @@ Proyek ini adalah bot Telegram yang terintegrasi dengan API Hyperbolic. Bot ini 
 - [Menjalankan Bot](#menjalankan-bot)
 
 ## Fitur
-- **Interaksi dengan API Hyperbolic:** Bot akan memproses pesan dari pengguna dan mengirimkannya ke API Hyperbolic untuk mendapatkan respons.
-- **Respon langsung melalui Telegram:** Jawaban dari API Hyperbolic langsung dikirimkan ke pengguna.
+✅ **Model Teks**  
+- Qwen/QwQ-32B
+- DeepSeek-R1
+- Llama-3.3-70B
+- Qwen2.5-72B
 
+✅ **Model Gambar**  
+- FLUX.1-dev
+- SDXL1.0-base
+- SD1.5
+- SSD
+- SD2
+- SDXL-turbo
+
+✅ **Audio Generation**  
+- Pilih bahasa (EN/ES/FR/ZH/JP/KR)
+- Pilih suara (EN-US/EN-BR/EN-INDIA/dll)
+- Konversi teks ke suara
+
+✅ **Keamanan**  
+- Otomatis hapus file sementara
+- Time-out sesi pengguna
+  
 ## Prasyarat
 Pastikan komputer Anda sudah terinstall:
 - [Node.js](https://nodejs.org)
