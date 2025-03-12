@@ -9,8 +9,6 @@ Proyek ini adalah bot Telegram yang terintegrasi dengan API Hyperbolic. Bot ini 
 - [Cara Membuat Bot Telegram (Melalui BotFather)](#cara-membuat-bot-telegram-melalui-botfather)
 - [Instalasi & Konfigurasi](#instalasi--konfigurasi)
 - [Menjalankan Bot](#menjalankan-bot)
-- [Penggunaan Bot](#penggunaan-bot)
-- [Catatan Tambahan](#catatan-tambahan)
 
 ## Fitur
 - **Interaksi dengan API Hyperbolic:** Bot akan memproses pesan dari pengguna dan mengirimkannya ke API Hyperbolic untuk mendapatkan respons.
